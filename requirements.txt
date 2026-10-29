@@ -1,0 +1,10 @@
+qiskit>=1.0
+qiskit-aer
+qiskit-ibm-runtime
+networkx
+numpy
+pandas
+matplotlib
+streamlit
+pytest
+# optional: mqt.bench

@@ -1,0 +1,36 @@
+circuit,method,ok,swaps,noise_cost,esp,expanded,generated,runtime_s,mem_kb,note
+qaoa_6,BFS,True,6.0,6.469,0.7475068463916396,1415,9905,0.1364,1439.1,
+qaoa_6,Greedy,True,9.0,9.661,0.696846562643017,9,9,0.0002,2.4,
+qaoa_6,A*-hop,True,6.0,6.45,0.7455964176393636,64,328,0.0063,59.5,optimal w.r.t. relevant-SWAP action set
+qaoa_6,A*-noise,True,6.0,6.45,0.7455964176393636,151,781,0.0152,115.2,optimal w.r.t. relevant-SWAP action set
+qaoa_6,A*-noise+comm,True,5.0,5.381,0.7655238053762136,42,241,0.0055,50.4,optimal w.r.t. relevant-SWAP action set
+qaoa_8,BFS,False,,,,20000,180000,2.3882,19076.0,BFS budget exhausted
+qaoa_8,Greedy,True,22.0,23.777,0.4700814960548627,22,22,0.0008,4.8,
+qaoa_8,A*-hop,True,21.0,22.917,0.4637786480407642,20000,114594,2.735,20788.2,budget exhausted -> greedy completion
+qaoa_8,A*-noise,True,27.0,29.024,0.43648195074406126,20000,115996,2.6039,19137.2,budget exhausted -> greedy completion
+qaoa_8,A*-noise+comm,True,10.0,10.771,0.6416611900972065,2154,16590,0.4866,4280.0,optimal w.r.t. relevant-SWAP action set
+qaoa_10,BFS,False,,,,20000,220000,3.0861,32220.6,BFS budget exhausted
+qaoa_10,Greedy,True,19.0,20.931,0.44426936801989086,19,19,0.001,4.4,
+qaoa_10,A*-hop,True,25.0,27.183,0.4020507031520722,20000,147278,3.797,38053.1,budget exhausted -> greedy completion
+qaoa_10,A*-noise,True,24.0,26.13,0.40522752242372045,20000,147557,4.0768,38677.7,budget exhausted -> greedy completion
+qaoa_10,A*-noise+comm,True,13.0,14.227,0.534197444238978,20000,210034,5.8038,60704.9,budget exhausted -> greedy completion
+qft_5,BFS,True,10.0,10.634,0.7199496469164887,5804,34824,0.5874,3875.6,
+qft_5,Greedy,True,20.0,21.255,0.5931471044839834,20,20,0.0007,5.0,
+qft_5,A*-hop,True,10.0,10.678,0.7146978392012509,306,1399,0.0458,192.1,optimal w.r.t. relevant-SWAP action set
+qft_5,A*-noise,True,10.0,10.618,0.7233869622986413,532,2469,0.079,352.6,optimal w.r.t. relevant-SWAP action set
+qft_5,A*-noise+comm,True,8.0,8.495,0.7547250182928082,577,2825,0.0982,650.8,optimal w.r.t. relevant-SWAP action set
+qft_6,BFS,False,,,,20000,140000,2.6756,19373.4,BFS budget exhausted
+qft_6,Greedy,True,40.0,42.984,0.3298105549501222,40,40,0.0013,9.6,
+qft_6,A*-hop,True,12.0,12.79,0.6285139674557013,2487,13110,0.5316,3474.4,optimal w.r.t. relevant-SWAP action set
+qft_6,A*-noise,True,12.0,12.79,0.6285139674557013,3952,20962,0.7118,4786.2,optimal w.r.t. relevant-SWAP action set
+qft_6,A*-noise+comm,True,12.0,12.79,0.6285139674557013,13368,81693,2.8837,21877.0,optimal w.r.t. relevant-SWAP action set
+ghz_8,BFS,True,0.0,0.0,0.9412529841967561,0,0,0.0001,1.7,
+ghz_8,Greedy,True,0.0,0.0,0.9412529841967561,0,0,0.0,0.8,
+ghz_8,A*-hop,True,0.0,0.0,0.9412529841967561,0,1,0.0001,0.9,optimal w.r.t. relevant-SWAP action set
+ghz_8,A*-noise,True,0.0,0.0,0.9412529841967561,0,1,0.0001,0.9,optimal w.r.t. relevant-SWAP action set
+ghz_8,A*-noise+comm,True,0.0,0.0,0.9412529841967561,0,1,0.0001,0.9,optimal w.r.t. relevant-SWAP action set
+rand_8,BFS,True,7.0,7.482,0.7672888428093576,5093,45837,0.8874,5835.6,
+rand_8,Greedy,True,11.0,11.724,0.7168872380102782,11,11,0.001,3.5,
+rand_8,A*-hop,True,7.0,7.458,0.7723494278689389,103,515,0.0167,79.2,optimal w.r.t. relevant-SWAP action set
+rand_8,A*-noise,True,7.0,7.438,0.7764975811091771,206,1048,0.031,137.3,optimal w.r.t. relevant-SWAP action set
+rand_8,A*-noise+comm,True,7.0,7.438,0.7764975811091771,206,1048,0.031,127.9,optimal w.r.t. relevant-SWAP action set
