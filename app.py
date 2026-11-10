@@ -394,6 +394,18 @@ with st.sidebar:
         )
         placement_id = PLACEMENT_MAP[placement_choice]
 
+        st.markdown("---")
+        st.markdown(
+            """
+            <div style="font-size: 12px; color: #94a3b8; line-height: 1.5; padding-top: 4px;">
+                <span style="font-weight: 700; color: #f8fafc;">⚛️ QRoute Engine v1.0.0</span><br/>
+                Author: <span style="color: #38bdf8; font-weight: 600;">Samarth</span><br/>
+                <a href="https://github.com/Bazuka13/qroute" target="_blank" style="color: #818cf8; text-decoration: none; font-weight: 600;">🔗 GitHub: Bazuka13/qroute</a>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
 # ----------------------------------------------------------------------------
 # Main Dashboard Hero Section
 # ----------------------------------------------------------------------------

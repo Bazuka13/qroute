@@ -39,3 +39,6 @@ Thumbs.db
 *.tmp
 results/
 __qiskit_cache__/
+*.docx
+*.pdf
+~$*.docx
