@@ -34,6 +34,9 @@ METHODS: Dict[str, Tuple[str, bool, bool]] = {
     "A*-hop": ("astar", False, False),          # Unit-cost SWAPs, strict program order
     "A*-noise": ("astar", False, True),         # Calibration error weighted, strict order
     "A*-noise+comm": ("astar", True, True),     # Full proposed method: noise + commutation
+    "Qiskit-Sabre": ("qiskit_sabre", False, False),          # Qiskit official SabreSwap pass
+    "Qiskit-Stochastic": ("qiskit_stochastic", False, False), # Qiskit classic StochasticSwap pass
+    "Qiskit-Lookahead": ("qiskit_lookahead", False, False),   # Qiskit LookaheadSwap pass
 }
 
 
@@ -107,7 +110,28 @@ def route(
     if measure_memory:
         tracemalloc.start()
 
-    if algo == "bfs":
+    if algo.startswith("qiskit_"):
+        pass_name = algo.split("_", 1)[1]
+        from .qiskit_bench import qiskit_route
+        res, qinfo = qiskit_route(
+            prepared,
+            sub,
+            routing_method=pass_name,
+            beta=beta,
+        )
+        if measure_memory:
+            res.peak_mem_kb = tracemalloc.get_traced_memory()[1] / 1024.0
+            tracemalloc.stop()
+        return res, {
+            "hw": sub,
+            "dag": dag,
+            "problem": problem,
+            "circ": prepared,
+            "l2p0": l2p0,
+            "routed_qc": qinfo.get("routed_qc"),
+            "depth": qinfo.get("depth", 0),
+        }
+    elif algo == "bfs":
         res = bfs_route(problem, l2p0, max_nodes=max_nodes, time_limit=time_limit, name=method)
     elif algo == "greedy":
         res = greedy_route(problem, l2p0, name=method)
@@ -163,6 +187,9 @@ def build_routed_circuit(res: RouteResult, info: Dict[str, Any]) -> QuantumCircu
     Returns:
         Qiskit QuantumCircuit defined on the physical hardware qubits.
     """
+    if info.get("routed_qc") is not None:
+        return info["routed_qc"]
+
     hw: Hardware = info["hw"]
     dag: DependencyDAG = info["dag"]
     qc = QuantumCircuit(hw.n)
@@ -170,8 +197,12 @@ def build_routed_circuit(res: RouteResult, info: Dict[str, Any]) -> QuantumCircu
     for op in res.ops:
         if op[0] == "swap":
             qc.swap(op[1], op[2])
-        else:
+        elif op[1] >= 0 and op[1] < len(dag.gates):
             g = dag.gates[op[1]]
             qc.append(g.op, list(op[2]))
+        elif len(op[2]) == 2:
+            qc.cx(op[2][0], op[2][1])
+        elif len(op[2]) == 1:
+            qc.id(op[2][0])
 
     return qc

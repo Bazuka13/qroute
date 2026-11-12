@@ -183,6 +183,16 @@ METHODS_MAP = {
         "badge": "Ablation",
         "summary": "Classic A* routing minimizing raw SWAP distance under strict gate order (Beta = 0).",
     },
+    "Qiskit SabreSwap [Industry Standard Transpiler]": {
+        "id": "Qiskit-Sabre",
+        "badge": "Qiskit Pass",
+        "summary": "Qiskit's official heuristic lookahead router (SabreSwap). Optimizes distance without coupler error awareness.",
+    },
+    "Qiskit StochasticSwap [Randomized Trial Baseline]": {
+        "id": "Qiskit-Stochastic",
+        "badge": "Qiskit Pass",
+        "summary": "Classic Qiskit trial-based randomized swap search along shortest coupling paths.",
+    },
     "Greedy Nearest-Gate Router [Heuristic Baseline]": {
         "id": "Greedy",
         "badge": "Baseline",
@@ -543,7 +553,7 @@ tabs = st.tabs([
     "🔄 Interactive SWAP Replay",
     "📊 Compilation Overview & Topology",
     "🧠 A* Search Frontier & Heuristics",
-    "🔬 Benchmark All 5 Methods",
+    "🔬 Benchmark: QRoute vs. Qiskit & Baselines",
     "📜 Routed Quantum Circuit & OpenQASM",
     "📖 Quantum Architecture Guide",
 ])
@@ -781,17 +791,18 @@ with tabs[2]:
         st.info("No search trace available for this routing method. Search traces are recorded when using an A* algorithm.")
 
 # ============================================================================
-# TAB 4: BENCHMARK ALL 5 METHODS (SIDE-BY-SIDE COMPARISON)
+# TAB 4: BENCHMARK: QROUTE VS. QISKIT & BASELINES
 # ============================================================================
 with tabs[3]:
-    st.markdown("### 🔬 Multi-Method Benchmark Comparison")
+    st.markdown("### 🔬 Multi-Method Benchmark: QRoute vs. Qiskit Transpiler")
     st.markdown(
         "Evaluate how the proposed **Noise-Adaptive & Commutativity-Aware A*** algorithm compares "
-        "against classical baseline compilers on the current quantum circuit."
+        "directly against **Qiskit's built-in transpiler routing passes** (SabreSwap, StochasticSwap) "
+        "and classical baselines on the current quantum circuit."
     )
 
     if st.button("🚀 Run Comparative Benchmark on Current Circuit", type="primary"):
-        with st.spinner("Benchmarking all 5 routing algorithms on target hardware..."):
+        with st.spinner("Benchmarking routing algorithms (including Qiskit Transpiler) on target hardware..."):
             bench_results = []
             for m_key, m_meta in METHODS_MAP.items():
                 m_id = m_meta["id"]
@@ -809,12 +820,18 @@ with tabs[3]:
                         verify=False,
                     )
                     t_elapsed = time.perf_counter() - t_start
+                    depth_m = info_m.get("depth", 0)
+                    if depth_m == 0 and res_m.success:
+                        depth_m = build_routed_circuit(res_m, info_m).depth()
+
                     bench_results.append({
                         "Algorithm Method": m_key.split(" [")[0],
+                        "Circuit Depth": depth_m if res_m.success else None,
                         "Inserted SWAPs": res_m.swaps if res_m.success else None,
                         "Total Noise Cost (g)": round(res_m.swap_cost, 2) if res_m.success else None,
                         "Estimated Success Probability": f"{res_m.esp * 100:.1f}%" if res_m.success else "Failed",
                         "ESP_Float": res_m.esp if res_m.success else 0.0,
+                        "Depth_Int": depth_m if res_m.success else 0,
                         "States Explored": res_m.nodes_expanded if res_m.success else 0,
                         "Runtime (s)": round(t_elapsed, 4),
                         "Success": "✅ Yes" if res_m.success else "❌ No",
@@ -822,10 +839,12 @@ with tabs[3]:
                 except Exception as ex:
                     bench_results.append({
                         "Algorithm Method": m_key.split(" [")[0],
+                        "Circuit Depth": None,
                         "Inserted SWAPs": None,
                         "Total Noise Cost (g)": None,
                         "Estimated Success Probability": "Error",
                         "ESP_Float": 0.0,
+                        "Depth_Int": 0,
                         "States Explored": 0,
                         "Runtime (s)": 0.0,
                         "Success": "❌ Error",
@@ -835,18 +854,61 @@ with tabs[3]:
 
     if "bench_df" in st.session_state:
         df_bench = st.session_state["bench_df"]
-        st.dataframe(df_bench.drop(columns=["ESP_Float"]), use_container_width=True)
+        st.dataframe(df_bench.drop(columns=["ESP_Float", "Depth_Int"]), use_container_width=True)
 
-        bcol1, bcol2 = st.columns(2)
+        # QRoute vs Qiskit Sabre Advantage Callout
+        qr_row = df_bench[df_bench["Algorithm Method"].str.contains("A\* Search \(Noise-Aware & Commutativity", regex=True)]
+        sabre_row = df_bench[df_bench["Algorithm Method"].str.contains("Qiskit SabreSwap", regex=True)]
+
+        if not qr_row.empty and not sabre_row.empty:
+            qr_esp = qr_row.iloc[0]["ESP_Float"]
+            sabre_esp = sabre_row.iloc[0]["ESP_Float"]
+            qr_depth = qr_row.iloc[0]["Depth_Int"]
+            sabre_depth = sabre_row.iloc[0]["Depth_Int"]
+            qr_swaps = qr_row.iloc[0]["Inserted SWAPs"] or 0
+            sabre_swaps = sabre_row.iloc[0]["Inserted SWAPs"] or 0
+
+            esp_diff = ((qr_esp - sabre_esp) / sabre_esp * 100.0) if sabre_esp > 0 else 0.0
+            depth_diff = ((sabre_depth - qr_depth) / sabre_depth * 100.0) if sabre_depth > 0 else 0.0
+
+            st.markdown("#### 🏆 QRoute Advantage Over Qiskit Transpiler (Sabre)")
+            hcol1, hcol2, hcol3 = st.columns(3)
+            with hcol1:
+                st.metric(
+                    "Fidelity (ESP) Advantage",
+                    f"{qr_esp * 100:.1f}%",
+                    f"{esp_diff:+.1f}% vs Qiskit Sabre",
+                    delta_color="normal",
+                )
+            with hcol2:
+                st.metric(
+                    "Circuit Gate Depth",
+                    f"{qr_depth} layers",
+                    f"{depth_diff:+.1f}% depth reduction" if depth_diff >= 0 else f"{depth_diff:.1f}% layers",
+                    delta_color="normal",
+                )
+            with hcol3:
+                st.metric(
+                    "Inserted SWAPs",
+                    f"{qr_swaps}",
+                    f"{sabre_swaps - qr_swaps:+d} fewer SWAPs",
+                    delta_color="normal",
+                )
+
+        bcol1, bcol2, bcol3 = st.columns(3)
         with bcol1:
             st.markdown("#### 📉 Total Noise Cost (Lower is Better)")
             st.bar_chart(df_bench.set_index("Algorithm Method")["Total Noise Cost (g)"])
 
         with bcol2:
-            st.markdown("#### 📈 Estimated Success Probability (Higher is Better)")
+            st.markdown("#### 📈 Success Probability (Higher is Better)")
             st.bar_chart(df_bench.set_index("Algorithm Method")["ESP_Float"])
+
+        with bcol3:
+            st.markdown("#### 📉 Circuit Depth (Lower is Better)")
+            st.bar_chart(df_bench.set_index("Algorithm Method")["Depth_Int"])
     else:
-        st.info("Click the 'Run Comparative Benchmark' button above to execute all 5 algorithms side-by-side on this circuit.")
+        st.info("Click the 'Run Comparative Benchmark' button above to execute QRoute against Qiskit Transpiler and classical baselines side-by-side on this circuit.")
 
 # ============================================================================
 # TAB 5: ROUTED QUANTUM CIRCUIT & OPENQASM EXPORT

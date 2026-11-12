@@ -18,6 +18,7 @@ from .hardware import Hardware, heavy_hex, grid, line, load_backend, from_backen
 from .circuit import DependencyDAG, prepare_circuit, load_qasm
 from .pipeline import route, build_routed_circuit, METHODS
 from .problem import RouteResult, RoutingProblem, Node, evaluate
+from .qiskit_bench import qiskit_route, stochastic_route, compare_with_qiskit
 
 __all__ = [
     "Hardware",
@@ -36,4 +37,7 @@ __all__ = [
     "grid",
     "line",
     "from_backend",
+    "qiskit_route",
+    "stochastic_route",
+    "compare_with_qiskit",
 ]
