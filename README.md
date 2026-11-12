@@ -256,13 +256,25 @@ QRoute includes a production-grade Streamlit application offering zero-lag vecto
 
 <div align="center">
 
-![Dashboard Mockup](assets/dashboard_mockup.jpg)
+![Live QRoute Dashboard Interface](assets/dashboard_live.png)
+
+*Figure: Real dashboard interface featuring compiler configuration presets, physical processor target, and key executive performance KPI cards.*
 
 </div>
 
 <div align="center">
 
-![Coupler Replay Mockup](assets/routing_graph_mockup.jpg)
+![Live Interactive SWAP Replay](assets/swap_replay_live.png)
+
+*Figure: Real-time step-by-step vector hardware coupler replay. Displays physical qubits, assigned logical qubits, calibration error-weighted couplers (Green $\to$ Red), and active SWAP permutations.*
+
+</div>
+
+<div align="center">
+
+![Live A* Frontier Convergence](assets/frontier_live.png)
+
+*Figure: Real-time A* search convergence trajectory monitoring accumulated cost $g(n)$, remaining heuristic $h(n)$, and total evaluation $f(n)$ alongside frontier priority queue size.*
 
 </div>
 
@@ -280,14 +292,16 @@ QRoute includes a production-grade Streamlit application offering zero-lag vecto
 
 ```
 qroute/
-├── assets/                             # High-resolution benchmark plots and UI mockups
+├── assets/                             # High-resolution benchmark plots and live UI screenshots
 │   ├── architecture_flowchart.png      # End-to-end system architecture flowchart
 │   ├── comparison.png                  # Multi-algorithm benchmark comparison chart
 │   ├── convergence_trace.png           # A* search convergence (g, h, f) and queue size
-│   ├── dashboard_mockup.jpg            # Interactive Streamlit dashboard UI mockup
+│   ├── dashboard_live.png              # Live Streamlit dashboard interface
+│   ├── frontier_live.png               # Live A* search frontier convergence analytics
 │   ├── hardware_topology.png           # Hardware coupling graph and error heatmap
-│   ├── routing_graph_mockup.jpg        # Dynamic qubit routing graph visualization
-│   └── runtime_memory_comparison.png   # Execution runtime and memory consumption chart
+│   ├── runtime_memory_comparison.png   # Execution runtime and memory consumption chart
+│   ├── swap_replay_live.png            # Live step-by-step vector hardware coupler replay
+│   └── topology_live.png               # Live hardware processor topology view
 │
 ├── qroute/                             # Core Python package
 │   ├── __init__.py                     # Package entry point and public API exports
